@@ -10,8 +10,13 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useModalOverlay } from "@/components/layout/ModalOverlayProvider";
+import {
+  CONTACT_FORM_TYPES,
+  formatServiceLabel,
+  type ContactFormType,
+} from "@/data/contactForm";
 import {
   consultationModalContent,
   initialConsultationFormData,
@@ -19,6 +24,7 @@ import {
 } from "@/data/consultationForm";
 import { serviceOptions } from "@/data/speakToExpert";
 import { overlayFade } from "@/lib/animations";
+import { ContactFormError, submitContactForm } from "@/lib/submitContactForm";
 import { cn } from "@/lib/utils";
 
 const inputClass =
@@ -36,6 +42,7 @@ interface ConsultationModalProps {
   /** Pre-select a service value when opening from a pricing plan */
   defaultService?: string;
   planName?: string;
+  formType?: ContactFormType;
 }
 
 function buildInitialFormData(
@@ -52,10 +59,12 @@ function buildInitialFormData(
 function ConsultationModalBody({
   defaultService,
   planName,
+  formType,
   onClose,
 }: {
   defaultService: string;
   planName?: string;
+  formType: ContactFormType;
   onClose: () => void;
 }) {
   const [form, setForm] = useState<ConsultationFormData>(() =>
@@ -63,6 +72,8 @@ function ConsultationModalBody({
   );
   const [errors, setErrors] = useState<Partial<Record<keyof ConsultationFormData, string>>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validate = (): boolean => {
     const next: Partial<Record<keyof ConsultationFormData, string>> = {};
@@ -76,10 +87,33 @@ function ConsultationModalBody({
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!validate()) return;
-    setSubmitted(true);
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      await submitContactForm({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim() || undefined,
+        service: formatServiceLabel(form.service),
+        message: form.comments.trim(),
+        type: formType,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof ContactFormError
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -216,8 +250,28 @@ function ConsultationModalBody({
         {consultationModalContent.footnote}
       </p>
 
-      <button type="submit" className="btn btn-primary btn-lg w-full">
-        {consultationModalContent.submitLabel}
+      {submitError && (
+        <p
+          role="alert"
+          className="font-primary rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-xs text-red-600"
+        >
+          {submitError}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="btn btn-primary btn-lg w-full disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {isSubmitting ? (
+          <span className="inline-flex items-center justify-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            Sending…
+          </span>
+        ) : (
+          consultationModalContent.submitLabel
+        )}
       </button>
 
       <p className="font-primary text-center text-xs text-muted-foreground">
@@ -238,6 +292,7 @@ export function ConsultationModal({
   onClose,
   defaultService = "amazon",
   planName,
+  formType = CONTACT_FORM_TYPES.PRICING_FORM,
 }: ConsultationModalProps) {
   const { setOpen: setModalOverlayOpen } = useModalOverlay();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -276,7 +331,7 @@ export function ConsultationModal({
     onClose();
   };
 
-  const sessionKey = `${defaultService}-${planName ?? ""}`;
+  const sessionKey = `${formType}-${defaultService}-${planName ?? ""}`;
 
   if (!mounted) return null;
 
@@ -328,6 +383,7 @@ export function ConsultationModal({
                 key={sessionKey}
                 defaultService={defaultService}
                 planName={planName}
+                formType={formType}
                 onClose={handleClose}
               />
             </div>

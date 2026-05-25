@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import { Sparkles } from "lucide-react";
+import { CONTACT_FORM_TYPES } from "@/data/contactForm";
 import { ExpertContactForm } from "@/components/ui/ExpertContactForm";
 import { speakToExpertContent } from "@/data/speakToExpert";
 import { sectionFadeUp } from "@/lib/animations";
@@ -91,7 +92,11 @@ export default function SpeakToExpert() {
           viewport={viewport}
           className="w-full"
         >
-          <ExpertContactForm idPrefix="expert" animationMode="inView" />
+          <ExpertContactForm
+            formType={CONTACT_FORM_TYPES.SPEAK_TO_EXPERT}
+            idPrefix="expert"
+            animationMode="inView"
+          />
         </motion.div>
       </div>
     </section>

@@ -3,13 +3,19 @@
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2, Sparkles } from "lucide-react";
+import {
+  CONTACT_FORM_TYPES,
+  expertFormToPayload,
+  type ContactFormType,
+} from "@/data/contactForm";
 import {
   initialExpertFormData,
   revenueOptions,
   serviceOptions,
   type ExpertFormData,
 } from "@/data/speakToExpert";
+import { ContactFormError, submitContactForm } from "@/lib/submitContactForm";
 import {
   animateButtonHover,
   formFieldItem,
@@ -27,6 +33,7 @@ const selectChevronStyle = {
 };
 
 interface ExpertContactFormProps {
+  formType: ContactFormType;
   idPrefix?: string;
   showWebsiteUrl?: boolean;
   /** immediate: animate on mount (contact page); inView: scroll-triggered (home section) */
@@ -37,6 +44,7 @@ interface ExpertContactFormProps {
 }
 
 export function ExpertContactForm({
+  formType = CONTACT_FORM_TYPES.SPEAK_TO_EXPERT,
   idPrefix = "expert",
   showWebsiteUrl = false,
   animationMode = "inView",
@@ -47,6 +55,8 @@ export function ExpertContactForm({
   const [form, setForm] = useState<ExpertFormData>(initialExpertFormData);
   const [errors, setErrors] = useState<Partial<Record<keyof ExpertFormData, string>>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const motionProps = !staggerFields
     ? {}
@@ -76,10 +86,26 @@ export function ExpertContactForm({
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!validate()) return;
-    setSubmitted(true);
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      await submitContactForm(expertFormToPayload(form, formType));
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof ContactFormError
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -313,19 +339,42 @@ export function ExpertContactForm({
           phone number or related information with any external parties.
         </motion.p>
 
-        <motion.div className="mt-6" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        {submitError && (
+          <p
+            role="alert"
+            className="font-primary mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-600"
+          >
+            {submitError}
+          </p>
+        )}
+
+        <motion.div
+          className="mt-6"
+          whileHover={isSubmitting ? undefined : { scale: 1.02 }}
+          whileTap={isSubmitting ? undefined : { scale: 0.98 }}
+        >
           <button
             ref={submitRef}
             type="submit"
-            className="btn btn-primary btn-lg group flex w-full items-center justify-center gap-2 bg-linear-to-r from-primary to-primary-light shadow-[0_0_40px_-10px_rgba(74,112,169,0.55)] transition-all duration-300 hover:shadow-[0_0_48px_-6px_rgba(74,112,169,0.65)]"
+            disabled={isSubmitting}
+            className="btn btn-primary btn-lg group flex w-full items-center justify-center gap-2 bg-linear-to-r from-primary to-primary-light shadow-[0_0_40px_-10px_rgba(74,112,169,0.55)] transition-all duration-300 hover:shadow-[0_0_48px_-6px_rgba(74,112,169,0.65)] disabled:cursor-not-allowed disabled:opacity-70"
             onMouseEnter={() => animateButtonHover(submitRef.current, true)}
             onMouseLeave={() => animateButtonHover(submitRef.current, false)}
           >
-            Submit Request
-            <ArrowRight
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
-              aria-hidden
-            />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                Sending…
+              </>
+            ) : (
+              <>
+                Submit Request
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </>
+            )}
           </button>
         </motion.div>
       </form>

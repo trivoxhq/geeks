@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import { Mail, Sparkles } from "lucide-react";
+import { CONTACT_FORM_TYPES } from "@/data/contactForm";
 import { ExpertContactForm } from "@/components/ui/ExpertContactForm";
 import { contactPageContent } from "@/data/contact";
 import gsap from "gsap";
@@ -102,6 +103,7 @@ export default function ContactPage() {
 
           <div ref={formCardRef} className="order-1 w-full lg:order-2">
             <ExpertContactForm
+              formType={CONTACT_FORM_TYPES.CONTACT_PAGE}
               idPrefix="contact"
               showWebsiteUrl
               staggerFields={false}

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
+import { CONTACT_FORM_TYPES } from "@/data/contactForm";
 import { ConsultationModal } from "@/components/ui/ConsultationModal";
 import { PricingPlanCard } from "@/components/sections/services/PricingPlanCard";
 import type { ServicePricingContent } from "@/data/services/servicePricing";
@@ -126,6 +127,7 @@ export function ServicePricing({
         onClose={() => setModalOpen(false)}
         defaultService={defaultService}
         planName={selectedPlan?.title}
+        formType={CONTACT_FORM_TYPES.PRICING_FORM}
       />
     </>
   );
