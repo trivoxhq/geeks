@@ -297,6 +297,139 @@ export function initInfoBannerCardsMotion(
   };
 }
 
+/** About Core Values — asymmetric panel reveal */
+export const coreValuesPanelsStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.08 },
+  },
+};
+
+export const coreValuesPanelItem: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+export const coreValuesPanelItemLeft: Variants = {
+  hidden: { opacity: 0, x: -48, y: 24 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+export const coreValuesPanelItemRight: Variants = {
+  hidden: { opacity: 0, x: 48, y: 24 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+export function animateCoreValuesPanelHover(
+  panelEl: HTMLElement | null,
+  iconEl: HTMLElement | null,
+  isHovering: boolean
+) {
+  if (!panelEl) return;
+
+  gsap.to(panelEl, {
+    y: isHovering ? -8 : 0,
+    scale: isHovering ? 1.012 : 1,
+    boxShadow: isHovering
+      ? "0 28px 64px -16px rgba(74, 112, 169, 0.32)"
+      : "0 20px 50px -24px rgba(74, 112, 169, 0.2)",
+    duration: 0.45,
+    ease: "power2.out",
+  });
+
+  if (iconEl) {
+    gsap.to(iconEl, {
+      y: isHovering ? -4 : 0,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }
+}
+
+/** About Core Values — floating blurs, divider line, panel parallax */
+export function initCoreValuesMotion(
+  sectionEl: HTMLElement | null,
+  options: {
+    dividerEl: HTMLElement | null;
+    blurEls: HTMLElement[];
+    panelEls: HTMLElement[];
+  },
+  prefersReducedMotion: boolean
+) {
+  if (!sectionEl || prefersReducedMotion) return () => {};
+
+  ensureScrollTrigger();
+  const cleanups: (() => void)[] = [];
+
+  options.blurEls.forEach((el, i) => {
+    const tween = gsap.to(el, {
+      x: i % 2 === 0 ? 24 : -20,
+      y: i % 2 === 0 ? -18 : 22,
+      duration: 14 + i * 3,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
+    cleanups.push(() => tween.kill());
+  });
+
+  if (options.dividerEl) {
+    gsap.set(options.dividerEl, { scaleY: 0, transformOrigin: "center top" });
+    const dividerTween = gsap.to(options.dividerEl, {
+      scaleY: 1,
+      duration: 1.1,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: sectionEl,
+        start: "top 72%",
+        toggleActions: "play none none none",
+      },
+    });
+    cleanups.push(() => {
+      dividerTween.scrollTrigger?.kill();
+      dividerTween.kill();
+    });
+  }
+
+  options.panelEls.forEach((el, index) => {
+    const tween = gsap.fromTo(
+      el,
+      { y: index === 0 ? 20 : -16 },
+      {
+        y: index === 0 ? -20 : 16,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionEl,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.25,
+        },
+      }
+    );
+    cleanups.push(() => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    });
+  });
+
+  return () => cleanups.forEach((fn) => fn());
+}
+
 /** How We Work — process step stagger */
 export const processStepsStagger: Variants = {
   hidden: { opacity: 0 },
