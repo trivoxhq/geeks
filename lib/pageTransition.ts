@@ -3,7 +3,7 @@ import gsap from "gsap";
 export type PageTransitionDirection = "forward" | "back" | "neutral";
 
 const EASE_SMOOTH = "power2.inOut";
-const DURATION = 0.42;
+const DURATION = 0.48;
 
 export function prefersReducedPageMotion(): boolean {
   if (typeof window === "undefined") return false;

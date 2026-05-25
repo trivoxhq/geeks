@@ -51,6 +51,10 @@
   --transition-duration-fast: 150ms;
   --transition-duration-slow: 300ms;
   --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Page route crossfade — shared by main content, header, hero background */
+  --page-transition-duration: 480ms;
+  --page-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --transition-ease-in: cubic-bezier(0.4, 0, 1, 1);
   --transition-ease-out: cubic-bezier(0, 0, 0.2, 1);
 

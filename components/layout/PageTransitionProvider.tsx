@@ -29,7 +29,7 @@ type NavigateOptions = {
 
 type PageTransitionContextValue = {
   navigateWithTransition: (href: string, options?: NavigateOptions) => void;
-  /** Pathname used for chrome (header, backgrounds) — updates after transition ends */
+  /** Pathname for chrome (header, backgrounds) — updates at navigation start */
   visualPathname: string;
   isTransitioning: boolean;
 };
@@ -82,7 +82,6 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
     if (shouldScroll) window.scrollTo({ top: 0, behavior: "instant" });
     isTransitioningRef.current = false;
     clearTransitionDirection();
-    setVisualPathname(pathnameRef.current);
   }, []);
 
   const navigateWithTransition = useCallback(
@@ -104,6 +103,8 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       const runNavigation = async () => {
         isTransitioningRef.current = true;
         applyTransitionDirection(direction);
+        /* Sync header/background with page crossfade — no post-transition delay */
+        setVisualPathname(targetPath);
 
         if (!supportsViewTransitions() || prefersReducedPageMotion()) {
           if (root) {

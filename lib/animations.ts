@@ -239,6 +239,64 @@ export const coreServicesCardItem: Variants = {
   },
 };
 
+/** About Info Banner — masonry card stagger */
+export const infoBannerMasonryStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.14, delayChildren: 0.1 },
+  },
+};
+
+export const infoBannerCardItem: Variants = {
+  hidden: { opacity: 0, y: 36, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+/** About Info Banner — subtle scroll parallax on masonry cards */
+export function initInfoBannerCardsMotion(
+  sectionEl: HTMLElement | null,
+  cardEls: HTMLElement[],
+  prefersReducedMotion: boolean
+) {
+  if (!sectionEl || !cardEls.length || prefersReducedMotion) return () => {};
+
+  ensureScrollTrigger();
+  const tweens: gsap.core.Tween[] = [];
+
+  cardEls.forEach((el, index) => {
+    const yOffset = index === 0 ? 28 : index === 1 ? -18 : 22;
+
+    const tween = gsap.fromTo(
+      el,
+      { y: yOffset * 0.35 },
+      {
+        y: yOffset * -0.35,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionEl,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.1 + index * 0.15,
+        },
+      }
+    );
+    tweens.push(tween);
+  });
+
+  return () => {
+    tweens.forEach((t) => {
+      t.scrollTrigger?.kill();
+      t.kill();
+    });
+  };
+}
+
 /** How We Work — process step stagger */
 export const processStepsStagger: Variants = {
   hidden: { opacity: 0 },
@@ -541,6 +599,56 @@ export function animateHeroBanner(options: {
     tl.kill();
     floatTween?.kill();
     glowTween?.kill();
+    parallaxTween?.scrollTrigger?.kill();
+    parallaxTween?.kill();
+  };
+}
+
+/** About page hero — subtle image zoom + scroll parallax */
+export function animateAboutHeroBackground(options: {
+  sectionEl: HTMLElement | null;
+  imageEl: HTMLElement | null;
+}) {
+  const { sectionEl, imageEl } = options;
+  if (!imageEl) return () => {};
+
+  ensureScrollTrigger();
+
+  gsap.set(imageEl, { scale: 1.08 });
+
+  const entrance = gsap.to(imageEl, {
+    scale: 1,
+    duration: 2.2,
+    ease: "power2.out",
+  });
+
+  const breathe = gsap.to(imageEl, {
+    scale: 1.04,
+    duration: 8,
+    ease: "sine.inOut",
+    yoyo: true,
+    repeat: -1,
+    delay: 2.2,
+  });
+
+  let parallaxTween: gsap.core.Tween | null = null;
+  if (sectionEl) {
+    parallaxTween = gsap.to(imageEl, {
+      y: 72,
+      scale: 1.1,
+      ease: "none",
+      scrollTrigger: {
+        trigger: sectionEl,
+        start: "top top",
+        end: "bottom top",
+        scrub: 1.2,
+      },
+    });
+  }
+
+  return () => {
+    entrance.kill();
+    breathe.kill();
     parallaxTween?.scrollTrigger?.kill();
     parallaxTween?.kill();
   };

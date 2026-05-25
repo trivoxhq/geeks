@@ -15,6 +15,7 @@ import { NavLink } from "@/components/layout/header/NavLink";
 import { contactCta, mainNavLinks } from "@/data/navigation";
 import { animateButtonHover } from "@/lib/animations";
 import { usePageTransitionOptional } from "@/components/layout/PageTransitionProvider";
+import { isHeroOverlayRoute } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 const SCROLL_THRESHOLD = 24;
@@ -83,9 +84,9 @@ export default function Header() {
 
   const closeMobile = () => setIsMobileOpen(false);
 
-  const isHome = visualPathname === "/";
-  const isSolidHeader = isScrolled || !isHome;
-  const isLightHeader = isHome && !isScrolled;
+  const isHeroOverlay = isHeroOverlayRoute(visualPathname);
+  const isSolidHeader = isScrolled || !isHeroOverlay;
+  const isLightHeader = isHeroOverlay && !isScrolled;
 
   return (
     <>
@@ -93,7 +94,7 @@ export default function Header() {
         className={cn(
           /* Absolute over hero at top; fixed when scrolled for sticky feel */
           "left-0 right-0 top-0 z-50 w-full",
-          "transition-[padding,background-color,box-shadow,border-color,backdrop-filter] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
+          "transition-[padding,background-color,box-shadow,border-color,backdrop-filter,color] duration-(--page-transition-duration,480ms) ease-(--page-transition-ease,cubic-bezier(0.22,1,0.36,1))",
           isSolidHeader ? "fixed" : "absolute",
           isSolidHeader
             ? "border-b border-black/[0.06] bg-white/80 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_4px_20px_-4px_rgba(0,0,0,0.08)] backdrop-blur-md backdrop-saturate-150 sm:py-3"

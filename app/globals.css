@@ -80,14 +80,14 @@
    ========================================================================== */
 
 ::view-transition-group(page-main) {
-  animation-duration: 0.42s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: var(--page-transition-duration, 0.48s);
+  animation-timing-function: var(--page-transition-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 ::view-transition-old(page-main),
 ::view-transition-new(page-main) {
-  animation-duration: 0.42s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: var(--page-transition-duration, 0.48s);
+  animation-timing-function: var(--page-transition-ease, cubic-bezier(0.22, 1, 0.36, 1));
   mix-blend-mode: normal;
 }
 
@@ -134,9 +134,11 @@ html[data-vt-active] body {
   overflow-x: clip;
 }
 
-/* Keep header/chrome stable while page content crossfades */
-html[data-vt-active] header {
-  transition: none !important;
+/* Chrome (header, hero bg) uses same timing as page crossfade */
+html[data-vt-active] header,
+[data-chrome-fade] {
+  transition-duration: var(--page-transition-duration, 0.48s) !important;
+  transition-timing-function: var(--page-transition-ease, cubic-bezier(0.22, 1, 0.36, 1)) !important;
 }
 
 /* ==========================================================================
