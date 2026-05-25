@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import AboutHero from "@/components/sections/about/AboutHero";
 import InfoBanner from "@/components/sections/about/InfoBanner";
 import CoreValues from "@/components/sections/about/CoreValues";
+import SpeakToExpert from "@/components/sections/SpeakToExpert";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -15,6 +16,7 @@ export default function AboutPage() {
       <AboutHero />
       <InfoBanner />
       <CoreValues />
+      <SpeakToExpert />
     </>
   );
 }
