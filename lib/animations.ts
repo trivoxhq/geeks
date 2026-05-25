@@ -1,4 +1,4 @@
-import type { Variants } from "framer-motion";
+﻿import type { Variants } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -296,6 +296,34 @@ export function initInfoBannerCardsMotion(
     });
   };
 }
+
+/** Service overview — split section image + copy */
+export const serviceOverviewContentReveal: Variants = {
+  hidden: { opacity: 0, x: 32, y: 20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+export const serviceOverviewTextStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+  },
+};
+
+export const serviceOverviewTextItem: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  },
+};
 
 /** About Core Values — asymmetric panel reveal */
 export const coreValuesPanelsStagger: Variants = {

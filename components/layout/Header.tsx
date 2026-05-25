@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { RiMenu2Line } from "react-icons/ri";
 import { Logo } from "@/components/layout/header/Logo";
@@ -14,6 +14,7 @@ import { MobileMenu } from "@/components/layout/header/MobileMenu";
 import { NavLink } from "@/components/layout/header/NavLink";
 import { contactCta, mainNavLinks } from "@/data/navigation";
 import { animateButtonHover } from "@/lib/animations";
+import { useModalOverlayOptional } from "@/components/layout/ModalOverlayProvider";
 import { usePageTransitionOptional } from "@/components/layout/PageTransitionProvider";
 import { isHeroOverlayRoute } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,11 @@ const SCROLL_THRESHOLD = 24;
 export default function Header() {
   const pathname = usePathname();
   const pageTransition = usePageTransitionOptional();
+  const modalOverlay = useModalOverlayOptional();
+  const isModalOpen = modalOverlay?.isOpen ?? false;
   const visualPathname = pageTransition?.visualPathname ?? pathname;
+  /* false until after mount — keeps hero header styles identical on server and client */
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMegaOpen, setIsMegaOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -47,9 +52,15 @@ export default function Header() {
     setIsScrolled((prev) => (prev === scrolled ? prev : scrolled));
   }, []);
 
+  useLayoutEffect(() => {
+    /* Sync real scroll position after hydration without SSR/client class mismatch */
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads window.scrollY once on mount
+    setIsScrolled(window.scrollY > SCROLL_THRESHOLD);
+    setIsHydrated(true);
+  }, []);
+
   /* rAF-throttled scroll listener — avoids flicker and excess re-renders */
   useEffect(() => {
-    handleScroll();
     let ticking = false;
 
     const onScroll = () => {
@@ -85,19 +96,23 @@ export default function Header() {
   const closeMobile = () => setIsMobileOpen(false);
 
   const isHeroOverlay = isHeroOverlayRoute(visualPathname);
-  const isSolidHeader = isScrolled || !isHeroOverlay;
-  const isLightHeader = isHeroOverlay && !isScrolled;
+  const isScrolledOnHero = isHydrated && isScrolled;
+  const isSolidHeader = !isHeroOverlay || isScrolledOnHero;
+  const isLightHeader = isHeroOverlay && !isSolidHeader;
+  const megaMenuOpen = isMegaOpen && !isModalOpen;
+  const mobileMenuOpen = isMobileOpen && !isModalOpen;
+
+  if (isModalOpen) return null;
 
   return (
     <>
       <header
         className={cn(
-          /* Absolute over hero at top; fixed when scrolled for sticky feel */
-          "left-0 right-0 top-0 z-50 w-full",
+          /* Always fixed; solid white bar when scrolled (sticky), transparent over hero at top */
+          "fixed left-0 right-0 top-0 z-50 w-full",
           "transition-[padding,background-color,box-shadow,border-color,backdrop-filter,color] duration-(--page-transition-duration,480ms) ease-(--page-transition-ease,cubic-bezier(0.22,1,0.36,1))",
-          isSolidHeader ? "fixed" : "absolute",
           isSolidHeader
-            ? "border-b border-black/[0.06] bg-white/80 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_4px_20px_-4px_rgba(0,0,0,0.08)] backdrop-blur-md backdrop-saturate-150 sm:py-3"
+            ? "border-b border-black/[0.06] bg-white py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_4px_20px_-4px_rgba(0,0,0,0.08)] sm:py-3"
             : "border-b border-transparent bg-transparent py-4 sm:py-5"
         )}
         role="banner"
@@ -126,7 +141,7 @@ export default function Header() {
               ))}
 
               <MegaMenuTrigger
-                isOpen={isMegaOpen}
+                isOpen={megaMenuOpen}
                 onOpen={openMega}
                 onClose={closeMega}
                 onToggle={toggleMega}
@@ -160,14 +175,14 @@ export default function Header() {
                     ? "text-white hover:opacity-80"
                     : "text-foreground hover:text-primary"
                 )}
-                aria-expanded={isMobileOpen}
+                aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-navigation"
-                aria-label={isMobileOpen ? "Close menu" : "Open menu"}
-                onClick={() => (isMobileOpen ? closeMobile() : openMobile())}
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                onClick={() => (mobileMenuOpen ? closeMobile() : openMobile())}
                 whileTap={{ scale: 0.94 }}
               >
                 <motion.span
-                  animate={isMobileOpen ? { rotate: 90, opacity: 0.6 } : { rotate: 0, opacity: 1 }}
+                  animate={mobileMenuOpen ? { rotate: 90, opacity: 0.6 } : { rotate: 0, opacity: 1 }}
                   transition={{ duration: 0.25 }}
                 >
                   <RiMenu2Line className="h-5 w-5" aria-hidden />
@@ -179,13 +194,13 @@ export default function Header() {
 
         {/* Centered mega menu — full header width */}
         <MegaMenuDropdown
-          isOpen={isMegaOpen}
+          isOpen={megaMenuOpen}
           onPanelEnter={cancelMegaClose}
           onPanelLeave={scheduleMegaClose}
         />
       </header>
 
-      <MobileMenu isOpen={isMobileOpen} onClose={closeMobile} />
+      <MobileMenu isOpen={mobileMenuOpen} onClose={closeMobile} />
     </>
   );
 }

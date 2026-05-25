@@ -10,5 +10,6 @@ export function normalizeRoutePath(path: string): string {
 
 export function isHeroOverlayRoute(path: string): boolean {
   const normalized = normalizeRoutePath(path);
-  return (HERO_OVERLAY_ROUTES as readonly string[]).includes(normalized);
+  if ((HERO_OVERLAY_ROUTES as readonly string[]).includes(normalized)) return true;
+  return normalized.startsWith("/services/");
 }

@@ -17,6 +17,7 @@ import {
   staggerContainer,
   staggerItem,
 } from "@/lib/animations";
+import { lockBodyScroll } from "@/lib/scrollLock";
 import { cn } from "@/lib/utils";
 
 interface MobileMenuProps {
@@ -28,21 +29,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const [servicesExpanded, setServicesExpanded] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  /* Reset accordion when drawer closes */
   useEffect(() => {
-    if (!isOpen) setServicesExpanded(false);
-  }, [isOpen]);
-
-  /* Lock body scroll when open */
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (!isOpen) return;
+    return lockBodyScroll();
   }, [isOpen]);
 
   /* Close on Escape */

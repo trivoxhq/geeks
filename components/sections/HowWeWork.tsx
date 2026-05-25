@@ -12,6 +12,7 @@ import {
   processStepsStagger,
   sectionFadeUp,
 } from "@/lib/animations";
+import { sectionHeadingClassName } from "@/lib/sectionTypography";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 
@@ -163,7 +164,7 @@ export default function HowWeWork() {
           </span>
           <h2
             id="how-we-work-heading"
-            className="font-secondary text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+            className={sectionHeadingClassName}
           >
             {howWeWorkContent.title}
           </h2>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Footer from "@/components/layout/Footer";
 import { HomePageBackground } from "@/components/layout/HomePageBackground";
 import Header from "@/components/layout/Header";
+import { ModalOverlayProvider } from "@/components/layout/ModalOverlayProvider";
 import { PageTransitionProvider } from "@/components/layout/PageTransitionProvider";
 import { fontInter, fontVariables } from "@/lib/fonts";
 import "./globals.css";
@@ -27,12 +28,14 @@ export default function RootLayout({
       <body
         className={`${fontInter.className} relative min-h-full flex flex-col bg-background text-foreground`}
       >
-        <HomePageBackground />
-        <Header />
-        <main className="relative z-10 flex-1">
-          <PageTransitionProvider>{children}</PageTransitionProvider>
-        </main>
-        <Footer />
+        <ModalOverlayProvider>
+          <HomePageBackground />
+          <Header />
+          <main className="relative z-10 flex-1">
+            <PageTransitionProvider>{children}</PageTransitionProvider>
+          </main>
+          <Footer />
+        </ModalOverlayProvider>
       </body>
     </html>
   );

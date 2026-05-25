@@ -126,6 +126,12 @@
   backface-visibility: hidden;
 }
 
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 html[data-vt-active] {
   overflow-x: clip;
 }

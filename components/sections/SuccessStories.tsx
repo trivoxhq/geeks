@@ -13,6 +13,7 @@ import {
   sectionFadeUp,
   sectionStagger,
 } from "@/lib/animations";
+import { sectionHeadingClassName } from "@/lib/sectionTypography";
 import gsap from "gsap";
 
 const viewport = { once: true, margin: "-80px" as const };
@@ -90,7 +91,7 @@ export default function SuccessStories() {
             <motion.h2
               id="success-stories-heading"
               variants={bulletStaggerItem}
-              className="font-secondary text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[2.75rem] lg:leading-tight"
+              className={sectionHeadingClassName}
             >
               {title}
             </motion.h2>
@@ -160,7 +161,7 @@ export default function SuccessStories() {
             viewport={viewport}
             className="w-full"
           >
-            <div className="overflow-hidden rounded-2xl border border-primary/10 bg-white/80 p-3 shadow-[0_20px_50px_-24px_rgba(74,112,169,0.35)] backdrop-blur-sm sm:rounded-3xl sm:p-4">
+            <div className="rounded-2xl border border-primary/10 bg-white/80 p-3 backdrop-blur-sm sm:rounded-3xl sm:p-4">
               <div className="mb-3 flex items-center gap-2 border-b border-primary/10 pb-3 sm:mb-4">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Calendar className="h-4 w-4" aria-hidden />
@@ -177,7 +178,7 @@ export default function SuccessStories() {
 
               <CalendlyEmbed
                 url={calendlyUrl}
-                className="min-h-[520px] sm:min-h-[600px] lg:min-h-[700px]"
+                className="h-[580px] sm:h-[630px]"
               />
             </div>
           </motion.div>

@@ -11,6 +11,7 @@ import {
   testimonialStories,
 } from "@/data/realStories";
 import { sectionFadeUp } from "@/lib/animations";
+import { sectionHeadingClassName } from "@/lib/sectionTypography";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -42,7 +43,7 @@ export default function RealStoriesResults() {
         >
           <h2
             id="real-stories-heading"
-            className="font-secondary text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
+            className={sectionHeadingClassName}
           >
             {realStoriesContent.title}
           </h2>

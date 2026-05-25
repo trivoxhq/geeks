@@ -61,11 +61,11 @@ export function CalendlyEmbed({ url, className }: CalendlyEmbedProps) {
       <div
         ref={containerRef}
         className={cn(
-          "calendly-inline-widget w-full overflow-hidden rounded-xl",
+          "calendly-inline-widget w-full rounded-xl [&_iframe]:h-full [&_iframe]:min-h-0",
           className
         )}
         data-url={url}
-        style={{ minWidth: 320, minHeight: 560 }}
+        style={{ minWidth: 320 }}
         aria-label="Schedule a free consultation"
       />
     </>

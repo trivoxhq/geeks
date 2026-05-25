@@ -71,6 +71,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
   const isTransitioningRef = useRef(false);
   const resolveNavigationRef = useRef<(() => void) | null>(null);
   const [visualPathname, setVisualPathname] = useState(pathname);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const waitForRouteCommit = useCallback(() => {
     return new Promise<void>((resolve) => {
@@ -81,6 +82,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
   const finishTransition = useCallback((shouldScroll: boolean) => {
     if (shouldScroll) window.scrollTo({ top: 0, behavior: "instant" });
     isTransitioningRef.current = false;
+    setIsTransitioning(false);
     clearTransitionDirection();
   }, []);
 
@@ -102,6 +104,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
 
       const runNavigation = async () => {
         isTransitioningRef.current = true;
+        setIsTransitioning(true);
         applyTransitionDirection(direction);
         /* Sync header/background with page crossfade — no post-transition delay */
         setVisualPathname(targetPath);
@@ -183,7 +186,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       value={{
         navigateWithTransition,
         visualPathname,
-        isTransitioning: isTransitioningRef.current,
+        isTransitioning,
       }}
     >
       <div

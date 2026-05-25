@@ -7,6 +7,7 @@ import { Sparkles } from "lucide-react";
 import { ExpertContactForm } from "@/components/ui/ExpertContactForm";
 import { speakToExpertContent } from "@/data/speakToExpert";
 import { sectionFadeUp } from "@/lib/animations";
+import { sectionHeadingClassName } from "@/lib/sectionTypography";
 import gsap from "gsap";
 
 const viewport = { once: true, margin: "-80px" as const };
@@ -74,7 +75,7 @@ export default function SpeakToExpert() {
           </span>
           <h2
             id="speak-to-expert-heading"
-            className="font-secondary text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
+            className={sectionHeadingClassName}
           >
             {speakToExpertContent.title}
           </h2>

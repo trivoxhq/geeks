@@ -1,10 +1,14 @@
+import dynamic from "next/dynamic";
 import HeroBanner from "@/components/sections/HeroBanner";
+import WhyWorkWithUs from "@/components/sections/WhyWorkWithUs";
 import CoreServices from "@/components/sections/CoreServices";
 import HowWeWork from "@/components/sections/HowWeWork";
-import RealStoriesResults from "@/components/sections/RealStoriesResults";
-import SpeakToExpert from "@/components/sections/SpeakToExpert";
-import SuccessStories from "@/components/sections/SuccessStories";
-import WhyWorkWithUs from "@/components/sections/WhyWorkWithUs";
+
+const SuccessStories = dynamic(() => import("@/components/sections/SuccessStories"));
+const RealStoriesResults = dynamic(
+  () => import("@/components/sections/RealStoriesResults")
+);
+const SpeakToExpert = dynamic(() => import("@/components/sections/SpeakToExpert"));
 
 export default function Home() {
   return (
