@@ -3,6 +3,10 @@ export const SERVICE_BENEFIT_ICON_NAMES = [
   "shopping-bag",
   "megaphone",
   "package",
+  "shield-check",
+  "search",
+  "bar-chart-3",
+  "line-chart",
 ] as const;
 
 export type ServiceBenefitIconName = (typeof SERVICE_BENEFIT_ICON_NAMES)[number];
