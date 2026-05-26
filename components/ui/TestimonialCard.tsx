@@ -45,7 +45,7 @@ export function TestimonialCard({ story, isActive = false }: TestimonialCardProp
       </div>
 
       <Quote
-        className="mt-5 h-10 w-10 text-primary/25"
+        className="mt-5 h-auto w-7 text-primary/25"
         strokeWidth={1.5}
         aria-hidden
       />
